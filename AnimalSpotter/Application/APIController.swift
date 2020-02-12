@@ -17,6 +17,7 @@ enum HTTPMethod: String {
 class APIController {
     
     private let baseUrl = URL(string: "https://lambdaanimalspotter.vapor.cloud/api")!
+    var bearer: Bearer?
     
     // create function for sign up
     func signUp(with user: User, completion: @escaping (Error?) -> ()) {
@@ -41,6 +42,22 @@ class APIController {
         }
  
         //set up data task and handle response
+        URLSession.shared.dataTask(with: request) { (_, response, error) in
+            //handle errors (like no internet connectivity, or anything that generates an Error object)
+            if let error = error {
+                completion(error)
+                return
+            }
+            
+            //handle client and server errors that generate non 200 status codes
+            if let response = response as? HTTPURLResponse,
+                response.statusCode != 200 {
+                completion(NSError(domain: "", code: response.statusCode, userInfo: nil))
+                return
+            }
+            //if we get this far the response contained no errors, so sign up was successful
+            completion(nil)
+        }.resume()
     }
     // create function for sign in
     
