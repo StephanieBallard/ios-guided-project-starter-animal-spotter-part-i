@@ -52,19 +52,30 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                     if let error = error {
                         NSLog("Error occured during sign up: \(error)")
                     } else {
-                        let alertController = UIAlertController(title: "Sign up Successful", message: "Now please log in.", preferredStyle: .alert)
-                        let alertAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
-                        alertController.addAction(alertAction)
-                        self.present(alertController, animated: true) {
-                            self.loginType = .signIn
-                            self.loginTypeSegmentedControl.selectedSegmentIndex = 1
-                            self.signInButton.setTitle("Sign In", for: .normal)
+                        DispatchQueue.main.async {
+                            let alertController = UIAlertController(title: "Sign up Successful", message: "Now please log in.", preferredStyle: .alert)
+                            let alertAction = UIAlertAction(title: "Ok", style: .default, handler: nil)
+                            alertController.addAction(alertAction)
+                            self.present(alertController, animated: true) {
+                                self.loginType = .signIn
+                                self.loginTypeSegmentedControl.selectedSegmentIndex = 1
+                                self.signInButton.setTitle("Sign In", for: .normal)
+                            }
                         }
                     }
                 }
                 
             } else {
                 //perform signin API call
+                apiController.signIn(with: user) { (error) in
+                    if let error = error {
+                        NSLog("Error occured during sign up: \(error)")
+                    } else {
+                        DispatchQueue.main.async {
+                            self.dismiss(animated: true, completion: nil)
+                        }
+                    }
+                }
             }
         
         }
